@@ -23,7 +23,7 @@ export function TemplateViewDialog({ open, onClose, template }: TemplateViewDial
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-[95vw] min-w-[95vw] max-w-[95vw] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Template Details</DialogTitle>
           <DialogDescription>

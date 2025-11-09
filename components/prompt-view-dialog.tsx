@@ -25,7 +25,7 @@ export function PromptViewDialog({ open, onClose, prompt, companyName }: PromptV
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-[95vw] min-w-[95vw] max-w-[95vw] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Prompt Details</DialogTitle>
           <DialogDescription>

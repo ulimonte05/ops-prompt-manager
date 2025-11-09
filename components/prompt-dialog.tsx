@@ -182,7 +182,7 @@ export function PromptDialog({ open, onClose, prompt, companies }: PromptDialogP
 
   return (
     <Dialog open={open} onOpenChange={(open) => !open && onClose(false)}>
-      <DialogContent className="w-[80vw] max-w-[80vw] max-h-[95vh] overflow-y-auto">
+      <DialogContent className="w-[95vw] min-w-[95vw] max-w-[95vw] max-h-[95vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{prompt ? "Edit Prompt" : "Create Prompt"}</DialogTitle>
           <DialogDescription>
