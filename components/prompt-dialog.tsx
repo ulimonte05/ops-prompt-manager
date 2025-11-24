@@ -162,12 +162,12 @@ export function PromptDialog({ open, onClose, prompt, companies }: PromptDialogP
   };
 
   const addVariable = () => {
-    if (newVariable.key && newVariable.value) {
+    if (newVariable.key) {
       setFormData({
         ...formData,
         variables: {
           ...formData.variables,
-          [newVariable.key]: newVariable.value,
+          [newVariable.key]: newVariable.value || "",
         },
       });
       setNewVariable({ key: "", value: "" });
