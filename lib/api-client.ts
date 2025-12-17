@@ -27,6 +27,66 @@ export interface PromptCondition {
   content: string;
 }
 
+// Tool Types - Field definition for headers and body fields
+export interface ToolField {
+  name: string;
+  type: 'string' | 'number' | 'boolean' | 'object' | 'array';
+  fieldType: 'static' | 'ai_generated' | 'orchestrator';
+  required: boolean;
+  value?: any;
+  aiInstruction?: string;
+  orchestratorVar?: string;
+}
+
+// Header definition
+export interface ToolHeader {
+  name: string;
+  value: string;
+  fieldType: 'static' | 'ai_generated' | 'orchestrator';
+  aiInstruction?: string;
+  orchestratorVar?: string;
+}
+
+// Complete tool definition structure (stored as JSONB)
+export interface ToolDefinition {
+  name: string;
+  description: string;
+  endpoint: string;
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+  timeout?: number;
+  headers: ToolHeader[];
+  body: {
+    fields: ToolField[];
+  };
+  responseSchema?: Record<string, any>;
+}
+
+// Tool entity from database
+export interface Tool {
+  id: string;
+  name: string;
+  type: 'crm' | 'http' | 'builtin';
+  tool_definition: ToolDefinition;
+  is_custom: boolean;
+  is_active: boolean;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// Input for creating a new tool
+export type CreateToolInput = {
+  name: string;
+  type: 'crm' | 'http' | 'builtin';
+  tool_definition: ToolDefinition;
+  is_custom?: boolean;
+  is_active?: boolean;
+  created_by: string;
+};
+
+// Input for updating an existing tool
+export type UpdateToolInput = Partial<Omit<CreateToolInput, 'created_by'>>;
+
 export interface Prompt {
   id: string;
   company_id: string;
@@ -270,6 +330,56 @@ export const promptsApi = {
     await fetchApi<ApiResponse<{ message: string }>>(`/prompts/${id}`, {
       method: 'DELETE',
     });
+  },
+};
+
+// Tools API - follows existing patterns
+export const toolsApi = {
+  list: async (filters?: {
+    type?: string;
+    is_custom?: boolean;
+    is_active?: boolean;
+  }): Promise<Tool[]> => {
+    const params = new URLSearchParams();
+    if (filters?.type) params.set('type', filters.type);
+    if (filters?.is_custom !== undefined) params.set('is_custom', String(filters.is_custom));
+    if (filters?.is_active !== undefined) params.set('is_active', String(filters.is_active));
+
+    const query = params.toString() ? `?${params.toString()}` : '';
+    const response = await fetchApi<ApiResponse<{ tools: Tool[] }>>(`/tools${query}`);
+    return response.tools || [];
+  },
+
+  get: async (id: string): Promise<Tool> => {
+    const response = await fetchApi<ApiResponse<{ tool: Tool }>>(`/tools/${id}`);
+    return response.tool;
+  },
+
+  create: async (data: CreateToolInput): Promise<Tool> => {
+    const response = await fetchApi<ApiResponse<{ tool: Tool }>>('/tools', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    return response.tool;
+  },
+
+  update: async (id: string, data: UpdateToolInput): Promise<Tool> => {
+    const response = await fetchApi<ApiResponse<{ tool: Tool }>>(`/tools/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+    return response.tool;
+  },
+
+  delete: async (id: string): Promise<void> => {
+    await fetchApi<ApiResponse<{ message: string }>>(`/tools/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
+  getActive: async (): Promise<Tool[]> => {
+    const response = await fetchApi<ApiResponse<{ tools: Tool[] }>>('/tools/active');
+    return response.tools || [];
   },
 };
 
